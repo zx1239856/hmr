@@ -18,19 +18,22 @@ python -m demo --img_path data/random.jpg --json_path data/random_keypoints.json
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 import sys
 from absl import flags
 import numpy as np
 
 import skimage.io as io
 import tensorflow as tf
+import time
 
 from src.util import renderer as vis_util
 from src.util import image as img_util
 from src.util import openpose as op_util
 import src.config
 from src.RunModel import RunModel
+from cam import open_cam_onboard
+
+import cv2
 
 flags.DEFINE_string('img_path', 'data/im1963.jpg', 'Image to run')
 flags.DEFINE_string(
@@ -47,19 +50,22 @@ def visualize(img, proc_param, joints, verts, cam):
 
     # Render results
     skel_img = vis_util.draw_skeleton(img, joints_orig)
-    rend_img_overlay = renderer(
-        vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
-    rend_img = renderer(
-        vert_shifted, cam=cam_for_render, img_size=img.shape[:2])
-    rend_img_vp1 = renderer.rotated(
-        vert_shifted, 60, cam=cam_for_render, img_size=img.shape[:2])
-    rend_img_vp2 = renderer.rotated(
-        vert_shifted, -60, cam=cam_for_render, img_size=img.shape[:2])
-
-    import matplotlib.pyplot as plt
-    # plt.ion()
-    plt.figure(1)
-    plt.clf()
+    #rend_img_overlay = renderer(
+    #    vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
+    #rend_img = renderer(
+    #    vert_shifted, cam=cam_for_render, img_size=img.shape[:2])
+    #rend_img_vp1 = renderer.rotated(
+    #    vert_shifted, 60, cam=cam_for_render, img_size=img.shape[:2])
+    #rend_img_vp2 = renderer.rotated(
+    #    vert_shifted, -60, cam=cam_for_render, img_size=img.shape[:2])
+    cv2.imshow('input',img)
+    cv2.imshow('joint projection',skel_img)
+    #cv2.imshow('3D Mesh overlay',rend_img_overlay)
+    #cv2.imshow('3D mesh',rend_img)
+    #cv2.imshow('diff vp',rend_img_vp1)
+    #cv2.imshow('diff vp 2',rend_img_vp2)
+    cv2.waitKey(25)
+    """
     plt.subplot(231)
     plt.imshow(img)
     plt.title('input')
@@ -88,10 +94,10 @@ def visualize(img, proc_param, joints, verts, cam):
     plt.show()
     # import ipdb
     # ipdb.set_trace()
+    """
 
-
-def preprocess_image(img_path, json_path=None):
-    img = io.imread(img_path)
+def preprocess_image(img, json_path=None):
+    #img = io.imread(img_path)
     if img.shape[2] == 4:
         img = img[:, :, :3]
 
@@ -117,18 +123,31 @@ def preprocess_image(img_path, json_path=None):
 
 
 def main(img_path, json_path=None):
+    config1 = tf.ConfigProto()
+    config1.gpu_options.allow_growth = True
     sess = tf.Session()
     model = RunModel(config, sess=sess)
-
-    input_img, proc_param, img = preprocess_image(img_path, json_path)
-    # Add batch dimension: 1 x D x D x 3
-    input_img = np.expand_dims(input_img, 0)
-
-    joints, verts, cams, joints3d, theta = model.predict(
-        input_img, get_theta=True)
-
-    visualize(img, proc_param, joints[0], verts[0], cams[0])
-
+    count = 0
+    st = time.time()
+    cap = open_cam_onboard(640, 480)
+    while True:
+        ret, image_np = cap.read()
+        image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
+        #cv2.imshow('p',image_np)
+        input_img, proc_param, img = preprocess_image(image_np, json_path)
+        # Add batch dimension: 1 x D x D x 3
+        input_img = np.expand_dims(input_img, 0)
+        joints, verts, cams, joints3d, theta = model.predict(input_img, get_theta=True)
+        #print(joints,verts,cams,joints3d,theta)
+        visualize(img, proc_param, joints[0], verts[0], cams[0])
+        count +=1
+	if(not count%30):
+            st = time.time()
+            count = 0
+	if(count<5):
+            continue
+        print('FPS: %f'%(count/(time.time()-st)))
+    #cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     config = flags.FLAGS

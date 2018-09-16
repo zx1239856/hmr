@@ -162,7 +162,6 @@ class RunModel(object):
             'joints3d': self.all_Js[-1],
             'theta': self.final_thetas[-1],
         }
-
         results = self.sess.run(fetch_dict, feed_dict)
 
         # Return joints in original image space.

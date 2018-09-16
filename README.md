@@ -1,10 +1,13 @@
-# End-to-end Recovery of Human Shape and Pose
+# End-to-end Recovery of Human Shape and Pose (TX2 Mod)
 
 Angjoo Kanazawa, Michael J. Black, David W. Jacobs, Jitendra Malik
 CVPR 2018
 
 [Project Page](https://akanazawa.github.io/hmr/)
 ![Teaser Image](https://akanazawa.github.io/hmr/resources/images/teaser.png)
+
+### Modified for Jetson TX2
+This is an unofficially moded HMR for TX2. It can grab frames from onboard cam of TX2 and process them.
 
 ### Requirements
 - Python 2.7
