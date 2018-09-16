@@ -8,6 +8,8 @@ CVPR 2018
 
 ### Modified for Jetson TX2
 This is an unofficially moded HMR for TX2. It can grab frames from onboard cam of TX2 and process them.
+#### Warning
+You have to build opendr manually from the folder included in the mod project, and remember to install Cython beforehand to prevent build failure!
 
 ### Requirements
 - Python 2.7
