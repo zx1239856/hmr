@@ -58,6 +58,8 @@ def visualize(img, proc_param, joints, verts, cam):
     #    vert_shifted, 60, cam=cam_for_render, img_size=img.shape[:2])
     #rend_img_vp2 = renderer.rotated(
     #    vert_shifted, -60, cam=cam_for_render, img_size=img.shape[:2])
+    cv2.namedWindow('input', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('joint projection', cv2.WINDOW_NORMAL)
     cv2.imshow('input',img)
     cv2.imshow('joint projection',skel_img)
     #cv2.imshow('3D Mesh overlay',rend_img_overlay)
@@ -130,36 +132,41 @@ def main(img_path, json_path=None):
     count = 0
     st = time.time()
     cap = open_cam_onboard(640, 480)
-    while True:
-        image_np = cv2.imread('data/im1963.jpg')
-        # print(image_np)
-        if image_np is None:
-            print("cannot read image")
-            break
-            
-        # cv2.namedWindow('origin_img', cv2.WINDOW_NORMAL)
-        # cv2.imshow('origin_img', image_np)
-        # cv2.waitKey(3000)
-        # cv2.destroyAllWindows()
+    # while True:
+    image_np = cv2.imread('data/im1963.jpg')
+    # print(image_np)
+    if image_np is None:
+        print("cannot read image")
+        # break
+        
+    # cv2.namedWindow('origin_img', cv2.WINDOW_NORMAL)
+    # cv2.imshow('origin_img', image_np)
+    # cv2.waitKey(3000)
+    # cv2.destroyAllWindows()
 
-        # ret, image_np = cap.read()
-        # print('\n\nshape', image_np.shape)
-        image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
-        #cv2.imshow('p',image_np)
-        input_img, proc_param, img = preprocess_image(image_np, json_path)
-        # Add batch dimension: 1 x D x D x 3
-        input_img = np.expand_dims(input_img, 0)
-        joints, verts, cams, joints3d, theta = model.predict(input_img, get_theta=True)
-        #print(joints,verts,cams,joints3d,theta)
-        visualize(img, proc_param, joints[0], verts[0], cams[0])
-        count +=1
-        if(not count%30):
-            st = time.time()
-            count = 0
-        if(count<5):
-            continue
-        print('FPS: %f'%(count/(time.time()-st)))
-    #cv2.destroyAllWindows()
+    # ret, image_np = cap.read()
+    # print('\n\nshape', image_np.shape)
+    image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
+    #cv2.imshow('p',image_np)
+    input_img, proc_param, img = preprocess_image(image_np, json_path)
+    # Add batch dimension: 1 x D x D x 3
+    input_img = np.expand_dims(input_img, 0)
+    joints, verts, cams, joints3d, theta = model.predict(input_img, get_theta=True)
+    #print(joints,verts,cams,joints3d,theta)
+    visualize(img, proc_param, joints[0], verts[0], cams[0])
+    count +=1
+
+    # print(joints.shape)
+    # print(joints)
+    # if(not count%30):
+    #     st = time.time()
+    #     count = 0
+    # if(count<5):
+    #     continue
+    # print('FPS: %f'%(count/(time.time()-st)))
+    cv2.waitKey(10000)
+    cv2.destroyAllWindows()
+    
 
 if __name__ == '__main__':
     config = flags.FLAGS
