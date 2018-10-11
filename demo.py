@@ -131,7 +131,19 @@ def main(img_path, json_path=None):
     st = time.time()
     cap = open_cam_onboard(640, 480)
     while True:
-        ret, image_np = cap.read()
+        image_np = cv2.imread('data/im1963.jpg')
+        # print(image_np)
+        if image_np is None:
+            print("cannot read image")
+            break
+            
+        # cv2.namedWindow('origin_img', cv2.WINDOW_NORMAL)
+        # cv2.imshow('origin_img', image_np)
+        # cv2.waitKey(3000)
+        # cv2.destroyAllWindows()
+
+        # ret, image_np = cap.read()
+        # print('\n\nshape', image_np.shape)
         image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
         #cv2.imshow('p',image_np)
         input_img, proc_param, img = preprocess_image(image_np, json_path)
@@ -141,10 +153,10 @@ def main(img_path, json_path=None):
         #print(joints,verts,cams,joints3d,theta)
         visualize(img, proc_param, joints[0], verts[0], cams[0])
         count +=1
-	if(not count%30):
+        if(not count%30):
             st = time.time()
             count = 0
-	if(count<5):
+        if(count<5):
             continue
         print('FPS: %f'%(count/(time.time()-st)))
     #cv2.destroyAllWindows()
