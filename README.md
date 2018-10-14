@@ -91,24 +91,22 @@ I have not tested them, but I appreciate the contribution! Thank you!!
 
 ### install chumpy for python 3 
 
-change directory to python site-packages
+change current directory to python site-packages
 
 ```
 # in my case
 cd anaconda3/lib/python3.6/site-packages
 ```
 
-clone chumpy for python 3 into site-packages
+clone chumpy(modified) for python 3 into site-packages
 
 ```
-git clone git@github.com:Li-plus/chumpy.git
+git clone https://github.com/Li-plus/chumpy.git
 ```
 
 ###  run demo
 
-waitKey is set to 10 sec
-
-input picture is set to data/im1963.jpg
+real time hmr human skeleton detection
 
 ```
 cd hmr/
