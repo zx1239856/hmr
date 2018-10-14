@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import sys
+sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 from absl import flags
 import numpy as np
 
@@ -159,9 +160,9 @@ def main(img_path, json_path=None):
     model = RunModel(config, sess=sess)
     count = 0
     st = time.time()
-    # cap = open_cam_onboard(640, 480)
+    #cap = open_cam_onboard(640, 480)
     cap = cv2.VideoCapture(0)
-    # cap = cv2.VideoCapture("/home/lijiahao/Documents/ZED/Explorer_VGA_SN17575_10-24-09.png")
+    #cap = cv2.VideoCapture("./data/coco1.png")
 
     while True:
         ret, image_np = cap.read()
@@ -184,7 +185,7 @@ def main(img_path, json_path=None):
 
         # ret, image_np = cap.read()
         # print('\n\nshape', image_np.shape)
-        run_hmr(model, image_np, 'left', json_path=json_path)
+        run_hmr(model, image_np[:,:1280,:], 'left', json_path=json_path)
         # run_hmr(model, image_np_right, 'right', json_path=json_path)
         count +=1
 
