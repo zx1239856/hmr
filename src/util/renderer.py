@@ -9,9 +9,9 @@ from __future__ import print_function
 import numpy as np
 import cv2
 
-from opendr.camera import ProjectPoints
-from opendr.renderer import ColoredRenderer
-from opendr.lighting import LambertianPointLight
+# from opendr.camera import ProjectPoints
+# from opendr.renderer import ColoredRenderer
+# from opendr.lighting import LambertianPointLight
 
 colors = {
     # colorbline/print/copy safe:
@@ -387,20 +387,23 @@ def draw_skeleton(input_image, joints, draw_edges=True, vis=None, radius=None):
         import ipdb
         ipdb.set_trace()
 
-    for child in xrange(len(parents)):
+    for child in range(len(parents)):
         point = joints[:, child]
         # If invisible skip
         if vis is not None and vis[child] == 0:
             continue
         if draw_edges:
-            cv2.circle(image, (point[0], point[1]), radius, colors['white'],
+            # print(type(colors['white']))
+            # print(colors)
+            # print('\n\ncolors[white]: ', colors['white'])
+            cv2.circle(image, (point[0], point[1]), radius, colors['white'].tolist(),
                        -1)
             cv2.circle(image, (point[0], point[1]), radius - 1,
-                       colors[jcolors[child]], -1)
+                       colors[jcolors[child]].tolist(), -1)
         else:
             # cv2.circle(image, (point[0], point[1]), 5, colors['white'], 1)
             cv2.circle(image, (point[0], point[1]), radius - 1,
-                       colors[jcolors[child]], 1)
+                       colors[jcolors[child]].tolist(), 1)
             # cv2.circle(image, (point[0], point[1]), 5, colors['gray'], -1)
         pa_id = parents[child]
         if draw_edges and pa_id >= 0:
@@ -408,13 +411,13 @@ def draw_skeleton(input_image, joints, draw_edges=True, vis=None, radius=None):
                 continue
             point_pa = joints[:, pa_id]
             cv2.circle(image, (point_pa[0], point_pa[1]), radius - 1,
-                       colors[jcolors[pa_id]], -1)
+                       colors[jcolors[pa_id]].tolist(), -1)
             if child not in ecolors.keys():
                 print('bad')
                 import ipdb
                 ipdb.set_trace()
             cv2.line(image, (point[0], point[1]), (point_pa[0], point_pa[1]),
-                     colors[ecolors[child]], radius - 2)
+                     colors[ecolors[child]].tolist(), radius - 2)
 
     # Convert back in original dtype
     if input_is_float:
